@@ -1,8 +1,8 @@
 
 function Output = Memb_Segment(ROI_Memb_Gray,   BW_Mask, SEG_Method,...
-    Current_Seed, BlockProcessingHight, BlockProcessingWidth, ...
-    Current_Minimum_Seed, Manually_Corrected_Membrane, Multithresh_Num_of_Clusters, ...
-    Mask_Dilation, Memb_Constuct_Cluster, N_memb, Subfolder_path_and_name)
+            Current_Seed, BlockProcessingHight, BlockProcessingWidth, ...
+            Current_Minimum_Seed, Manually_Corrected_Membrane, Multithresh_Num_of_Clusters, ...
+            Mask_Dilation, Memb_Constuct_Cluster);
 
 
 
@@ -185,7 +185,6 @@ switch SEG_Method
         
         Output = bwmorph(put_seed, 'thin', Inf);   %Final Output result image
         
-        imwrite(Current_Minimum_Seed, [Subfolder_path_and_name,['\Seed_', N_memb]], 'tif', 'Compression','none');  
         
 end
 
