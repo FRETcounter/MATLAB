@@ -422,11 +422,11 @@ elseif Start_Reference_Mask == 0  %Checkbox is off. No starting reference mask
         
         %Clean the image from spurs and any seperated objects
         I = I_Memb_Segment;
-        [H W] = size(I);
-        I_Pad = padarray(I, [10 10], 'both');
-        I_Spr = bwmorph(I_Pad, 'spur', Inf);  %Added 17 Nov. 2016.
-        I = imcrop(I_Spr, [11 11 (W-1) (H-1)]);
-        I = Largest_Obj(I);
+%         [H W] = size(I);
+%         I_Pad = padarray(I, [10 10], 'both');
+%         I_Spr = bwmorph(I_Pad, 'spur', Inf);  %Added 17 Nov. 2016.
+%         I = imcrop(I_Spr, [11 11 (W-1) (H-1)]);
+%         I = Largest_Obj(I);
         
         
         %Manually correct the current frame
