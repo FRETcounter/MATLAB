@@ -169,22 +169,39 @@ switch SEG_Method
         
         % Binarize the membrane because it is not logical yet
         
-        Thin_II = bwmorph(II, 'thin', Inf);
-
+        %Thin_II = bwmorph(II, 'thin', Inf);
+        
+        %first thinning
+        s = [10,10];  %pad the image
+        I = padarray(II,s,0,'both');
+        I_thin = bwmorph(I, 'thin', Inf); %Thin
+        I_Spur = bwmorph(I_thin, 'spur', Inf);  %4-spur removal
+        I_Clean = bwmorph(I_Spur, 'clean'); % 5-clean the image from isolated single pixels
+        I_Remove_Pad = I_Clean(1+s(1):end-s(1),1+s(2):end-s(2)); % remove the padding
+        
+        First_I_Thin = RemoveSingelPixelObject(I_Remove_Pad);
+        
+        
         Smooth_Dilation_Size = 3;
         SE_Wide = strel('rectangle', [Smooth_Dilation_Size   Smooth_Dilation_Size]);
-        I_Dilate = imdilate(Thin_II, SE_Wide);
+        I_Dilate = imdilate(First_I_Thin, SE_Wide);
         
-  
+        
         % now put the minimum seed
         put_seed = immultiply(I_Dilate, ~Current_Minimum_Seed);
         put_seed = im2bw(put_seed);
+
+        %Second thinning after putting the seed
+        s = [10,10];  %pad the image
+        I = padarray(put_seed,s,0,'both');
+        I_thin = bwmorph(I, 'thin', Inf); %Thin
+        I_Spur = bwmorph(I_thin, 'spur', Inf);  %4-spur removal
+        I_Clean = bwmorph(I_Spur, 'clean'); % 5-clean the image from isolated single pixels
+        I_Remove_Pad = I_Clean(1+s(1):end-s(1),1+s(2):end-s(2)); % remove the padding
         
-         
-        %I_Erode = imdilate(put_seed, SE_Wide);
-        
-        Output = bwmorph(put_seed, 'thin', Inf);   %Final Output result image
-        
+        Second_I_Thin = RemoveSingelPixelObject(I_Remove_Pad);
+        Output = Second_I_Thin;
+
         
 end
 
