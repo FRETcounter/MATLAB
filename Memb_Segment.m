@@ -155,7 +155,7 @@ switch SEG_Method
         D = -bwdist(~bw);
         mask = imextendedmin(D,level);
         D2 = imimposemin(D,mask);
-        Ld2 = watershed(D2);
+        Ld2 = watershed(D2, 4);
         II = Ld2;
         II(II > 0) = 1;
         thr = graythresh(II);
