@@ -1,21 +1,7 @@
-function FRET_Visualize(X, Y, Z, MicPerPix, TimeInterv, StartFrame, EndFrame, Max_Hist, Min_Hist);
+function FRET_Visualize(X, Y, Z, MicPerPix, TimeInterv, StartFrame, EndFrame, Max_Hist, Min_Hist, parent_path)
 
 Frames=[StartFrame:1:EndFrame];    % frame start and end
-% X=[];
-% Y=[];
-% Z=[];
-% 
-% 
-% 
-% for i=Frames
-%     X{i} = single(imread(['memb_RFP_T' num2str(i,'%02d') '.tif'])); % name of the image
-%     X{i} = imrotate(X{i},-rotdeg);
-%     Y{i} = single(imread(['CFP_T' num2str(i,'%02d') '.tif']));
-%     Y{i} = imrotate(Y{i},-rotdeg);
-%     Z{i} = single(imread(['YFP_T' num2str(i,'%02d') '.tif']));
-%     Z{i} = imrotate(Z{i},-rotdeg);
-% end
-%%
+
 CC_individual=[];
 L_individual=[];
 RatioQuant_individual=[];
@@ -138,17 +124,20 @@ cmap = ZZ(256);
 Lrgb = label2rgb(LL,cmap);
 
 hold on
+%figure(1001)
 imshow(Lrgb,[])
 colormap (bar_color)
 
 colorbar('Ticks',[1:255*0.1/(MaxRatioValue-MinRatioValue):256],'TickLabels',{MinRatioValue:0.1:MaxRatioValue});
-hold off
+
 
 % save result as pdf file
-fig=gcf;
+fig = figure(1);
 fig.PaperPositionMode='auto';
-print('RawRatio','-dpdf','-fillpage')
 
+print(fig,[parent_path,'RawRatio'],'-dpdf','-fillpage')
+
+hold off
 end
 
 %**************************************************************************

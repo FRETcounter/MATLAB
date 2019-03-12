@@ -1,3 +1,13 @@
+
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+%                  Developed by Mustafa Sami, RIKEN BDR
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+
+
 function varargout = FRET_Counter(varargin)
 % FRET_COUNTER MATLAB code for FRET_Counter.fig
 %      FRET_COUNTER, by itself, creates a new FRET_COUNTER or raises the existing
@@ -120,11 +130,6 @@ end
 
 
 
-
-% fileName = handles.fileName; %******* Import **********
-% imshow(fileName);
-
-
 % --- Executes on button press in pushbutton8.
 function pushbutton8_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton8 (see GCBO)
@@ -144,48 +149,36 @@ function slider1_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
+pathName = {};
 
-try
-    pathName = {};
+fileNames = handles.fileNames;
+num_frames = handles.num_frames;
+pathName = handles.pathName;
+
+set(handles.slider1, 'SliderStep', [1/num_frames 10/num_frames],'Min', 1,'Max', num_frames);
+
+t2 = get(handles.slider1,'Value');
+t2 = round(t2);
+set(handles.text3,'String',num2str(t2));   %this will include the decimal
+set(handles.slider1, 'Value', t2);
+
+set(handles.edit31,'String',fileNames{t2}); % update the edit2 with file name
+
+if t2 <= num_frames
+    g = imread([pathName,fileNames{t2}]);
+    imshow(g, []);
     
-    try
-        fileNames = handles.fileNames;
-        num_frames = handles.num_frames;
-        pathName = handles.pathName;
-    catch
-        if isempty(pathName)
-            msgbox({'No images found!';...
-                'Please load your images first by clicking';...
-                '"Load Stack" button'})
-        end
-    end
+else
+    Z = ([pathName,imread(fileNames{num_frames})]);
+    imshow(Z, []);
+    set(handles.text1,'String',num2str(num_frames));
+    title('Reached Last Frame', 'Color','r',...
+        'FontSize',10,'FontWeight','bold');
+    set(handles.slider1,'value', num_frames);
     
-    
-    set(handles.slider1, 'SliderStep', [1/num_frames 10/num_frames],'Min', 1,'Max', num_frames);
-    
-    t2 = get(handles.slider1,'Value');
-    t2 = round(t2);
-    set(handles.text3,'String',num2str(t2));   %this will include the decimal
-    set(handles.slider1, 'Value', t2);
-    
-    set(handles.edit31,'String',fileNames{t2}); % update the edit2 with file name
-    
-    
-    if t2 <= num_frames
-        g = imread([pathName,fileNames{t2}]);
-        imshow(g, []);
-        
-    else
-        Z = ([pathName,imread(fileNames{num_frames})]);
-        imshow(Z, []);
-        set(handles.text1,'String',num2str(num_frames));
-        title('Reached Last Frame', 'Color','r',...
-            'FontSize',10,'FontWeight','bold');
-        set(handles.slider1,'value', num_frames);
-        %set(handles.text1,'String', 1);
-        
-    end
 end
+
+
 
 % --- Executes during object creation, after setting all properties.
 function slider1_CreateFcn(hObject, eventdata, handles)
@@ -315,7 +308,7 @@ function pushbutton15_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton15 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-%Input Values
+
 try
     
     pathName = {};
@@ -334,21 +327,6 @@ try
     
     
     
-    % 1- Anisotropic Filter
-    % edit6_val_string = get(handles.edit6, 'String');
-    % num_iter = str2num(edit6_val_string);
-    
-    % edit7_val_string = get(handles.edit7, 'String');
-    % delta_t = str2num(edit7_val_string);
-    %
-    % edit8_val_string = get(handles.edit8, 'String');
-    % kappa = str2num(edit8_val_string);
-    %
-    % edit9_val_string = get(handles.edit9, 'String');
-    % Dilation_Size = str2num(edit9_val_string);
-    %
-    % edit11_val_string = get(handles.edit11, 'String');
-    % High_Pass_Filter = str2num(edit11_val_string);
     
     edit3_val_string = get(handles.edit3, 'String');
     Start_Frame =  str2num(edit3_val_string);
@@ -367,14 +345,8 @@ try
     Multithresh_Num_of_Clusters = str2num(edit14_val_string);
     
     
-    % edit14_val_string = get(handles.edit14, 'String');
-    % SeedSize = str2num(edit14_val_string);
-    
     SeedSize = 2;   %fix
     
-    
-    % edit15_val_string = get(handles.edit15, 'String');
-    % Frame_Val = str2num(edit15_val_string);
     
     edit16_val_string = get(handles.edit16, 'String');
     BlockProcessingHight = str2num(edit16_val_string);
@@ -384,50 +356,49 @@ try
     
     
     edit13_val_string = get(handles.edit13, 'String');
-    membrane_shift = str2num(edit13_val_string);  % this will be used for the single cell membrane analysis selection  SEG_Method == 19
+    membrane_shift = str2num(edit13_val_string);      
     
     
-    
-    checkboxStatus1 = get(handles.checkbox1,'Value');  % in case of if the checkbox is ON
+    checkboxStatus1 = get(handles.checkbox1,'Value');  
     if(checkboxStatus1)
-        Start_Reference_Mask = 1; %  in case of if the checkbox is selected
+        Start_Reference_Mask = 1; 
     else
-        Start_Reference_Mask = 0;  %  in case of if the checkbox is not selected
+        Start_Reference_Mask = 0;  
     end
     
     
-    checkboxStatus2 = get(handles.checkbox2,'Value');  % in case of if the checkbox os ON
+    checkboxStatus2 = get(handles.checkbox2,'Value');  
     if(checkboxStatus2)
-        Inverese_Reading = 1; %  in case of if the checkbox is selected
+        Inverese_Reading = 1; 
     else
-        Inverese_Reading = 0;  %  in case of if the checkbox is not selected
+        Inverese_Reading = 0;  
     end
     
     
-    checkboxStatus3 = get(handles.checkbox3,'Value');  % in case of if the checkbox os ON
+    checkboxStatus3 = get(handles.checkbox3,'Value');  
     if(checkboxStatus3)
-        Invert_Raw_Image = 1; %  in case of if the checkbox is selected
+        Invert_Raw_Image = 1; 
     else
-        Invert_Raw_Image = 0;  %  in case of if the checkbox is not selected
+        Invert_Raw_Image = 0;  
     end
     
     
-    checkboxStatus4 = get(handles.checkbox4,'Value');  % in case of if the checkbox os ON
+    checkboxStatus4 = get(handles.checkbox4,'Value');  
     if(checkboxStatus4)
-        Previous_Segmentation_Window = 1; %  in case of if the checkbox is selected
+        Previous_Segmentation_Window = 1; 
     else
-        Previous_Segmentation_Window = 0;  %  in case of if the checkbox is not selected
+        Previous_Segmentation_Window = 0;  
     end
     
     
     
     
-    checkboxStatus8 = get(handles.checkbox8,'Value');  % in case of if the checkbox is ON
+    checkboxStatus8 = get(handles.checkbox8,'Value');  
     
     if(checkboxStatus8)
-        Scape_Manual_Correction = 1; %  in case of if the checkbox is selected
+        Scape_Manual_Correction = 1; 
     else
-        Scape_Manual_Correction = 0; %  in case of if the checkbox is not selected
+        Scape_Manual_Correction = 0; 
     end
     
     
@@ -462,14 +433,7 @@ try
     
     if SEG_Method == 18   % apply the segmentation method without masking or seeding
         
-        
-        
-        %     waitfor(msgbox('Please upload your membrane marker raw stack images'));
-        %
-        %     [fileName,pathName_MembRaw] = uigetfile('*.tif');
-        %     dname       = fullfile(pathName_MembRaw,fileName);
-        %     filelist_MembRaw = dir([fileparts(dname) filesep '*.tif']);
-        
+
         pathName_MembRaw = pathName;
         filelist_MembRaw = filelist;
         
@@ -477,17 +441,14 @@ try
         fileNames_MembRaw = {filelist_MembRaw.name}';
         fileNames_MembRaw = fileNames_MembRaw (Start_Frame:End_Frame);  % targeted frames
         
-        %Inverese reading checkbox
         if Inverese_Reading ==1
             fileNames_MembRaw = flipud(fileNames_MembRaw);
         end
         
         num_frames = (numel(filelist_MembRaw));
-        % MembRaw = imread(fullfile(pathName_MembRaw, fileNames_MembRaw{Start_Frame}));
         MembRaw = imread(fullfile(pathName_MembRaw, fileNames_MembRaw{1}));
-        %imshow(MembRaw, []);
         
-        Memb_Array = []
+        Memb_Array = [];
         
         End = (numel(fileNames_MembRaw));
         for k = 1:End
@@ -511,20 +472,13 @@ try
             fun = @(block_struct) thresher(block_struct.data);
             block_otsu = blockproc(Comp_I,[Window_H, Window_W],fun); %block hight then width
             block_otsu = bwareaopen(block_otsu,Smallest_Obj_remove);
-            %imshow(block_otsu);
             bw = block_otsu;
-            
-            % SE_Wide = strel('rectangle', [3   3]);
-            % BW_Erode = imerode(bw, SE_Wide);
-            % BW_Dilate = imdilate(BW_Erode, SE_Wide);
-            % BW_Fill = imfill(BW_Dilate,'holes');
+
             level = 1;
             D = -bwdist(~bw);
-            % Ld = watershed(D);
             mask = imextendedmin(D,level);
-            %imshowpair(bw,mask,'blend')
             D2 = imimposemin(D,mask);
-            Ld2 = watershed(D2);
+            Ld2 = watershed(D2); % sometime works better than Ld2 = watershed(D2, 4); 
             
             
             II = Ld2;
@@ -543,18 +497,19 @@ try
             
             Thin_I = bwmorph(I_Erode,'thin', inf);
             % final spur removal
-            I = bwmorph(Thin_I,'spur', inf);   %Final Output
+            I = bwmorph(Thin_I,'spur', inf); 
             
             
             [H W] = size(I);
             I_Pad = padarray(I, [10 10], 'both');
-            I_Spr = bwmorph(I_Pad, 'spur', Inf);  %Added 17 Nov. 2016.
+            I_Spr = bwmorph(I_Pad, 'spur', Inf);  
             I = imcrop(I_Spr, [11 11 (W-1) (H-1)]);
             I = Largest_Obj(I);
             
-            %**************************************************************************
-            % Manually correct the first frame **************************************
-            %**************************************************************************
+            %**************************************************************
+            % *********Manually correct the first frame *******************
+            %**************************************************************
+            
             ground_truth = Memb_Array{z};
             FileName_ground_truth = fileNames_MembRaw{z};
             
@@ -569,13 +524,15 @@ try
                 
             elseif Previous_Segmentation_Window == 1
                 
-                Previous_ground_truth = Memb_Array{z};  % during initialization only. Added 24 March 2017
-                Previous_FileName_ground_truth = fileNames_MembRaw{z};  % during initialization only. Added 24 March 2017
+                Previous_ground_truth = Memb_Array{z};  % during initialization only
+                Previous_FileName_ground_truth = fileNames_MembRaw{z};  % during initialization only
                 
                 if  Scape_Manual_Correction == 1 %  in case of if the checkbox is not selected
                     I = I;
                 elseif    Scape_Manual_Correction == 0
-                    I = Manual_Correction_Tool2_TwoWindow (I, ground_truth, Memb_Array, FileName_ground_truth, Invert_Raw_Image, Previous_ground_truth, Previous_FileName_ground_truth, pathName);
+                    I = Manual_Correction_Tool2_TwoWindow (I, ground_truth,...
+                        Memb_Array, FileName_ground_truth, Invert_Raw_Image, ...
+                        Previous_ground_truth, Previous_FileName_ground_truth, pathName);
                 end
                 
             end
@@ -584,45 +541,32 @@ try
             Mask_I = I;
             Mask_Array {z} = Mask_I;  % save the mask
             
-            Pre_Seed =   ~Mask_I;
-            Seed_Obj = imclearborder(Pre_Seed, 4);
-            BW_Seed = FindSeeds (Seed_Obj, SeedSize);
-            Seed_Array {z} =  BW_Seed;
+%             Pre_Seed =   ~Mask_I;
+%             Seed_Obj = imclearborder(Pre_Seed, 4);
+%             BW_Seed = FindSeeds (Seed_Obj, SeedSize);
+%             Seed_Array {z} =  BW_Seed;
+%             
+%             SE_FullSeed = strel('rectangle', [Mask_Dilation  Mask_Dilation]);  %or use same Dilation_Size
+%             Full_Seed = imerode(Seed_Obj, SE_FullSeed);
+%             Both_Seeds = imadd(Full_Seed, BW_Seed);
+%             Both_Seeds = im2bw(Both_Seeds);
+%             Both_Seeds_Array{1} = Both_Seeds;
             
-            SE_FullSeed = strel('rectangle', [Mask_Dilation  Mask_Dilation]);  %or use same Dilation_Size
-            Full_Seed = imerode(Seed_Obj, SE_FullSeed);
-            Both_Seeds = imadd(Full_Seed, BW_Seed);
-            Both_Seeds = im2bw(Both_Seeds);
-            Both_Seeds_Array{1} = Both_Seeds;
-            
-            
-            %Save the first corrected membrane
-            %mkdir('Segmented_Membrane_Result') %where to save results
+           
             Subfolder_path_and_name = [pathName 'Segmented_Membrane_Result'];
             mkdir(Subfolder_path_and_name) %where to save results
             
-            
-            
             N_memb = fileNames_MembRaw{z};
             
-            %         Mask_I = ~Mask_I;
-            %         Mask_I = imclearborder(Mask_I, 4);
-            
-            %imwrite(Mask_I, ['Segmented_Membrane_Result\memb_', N_memb], 'tif', 'Compression','none')
-            
-            imwrite(Reference_Mask, [Subfolder_path_and_name,'\Memb_', N_memb], 'tif', 'Compression','none')
+            imwrite(Mask_I, [Subfolder_path_and_name,'\Memb_', N_memb], 'tif', 'Compression','none')
             
         end
         
         
         
-    elseif SEG_Method == 19   % apply the segmentation method to a single cell without masking or seeding   Added 19 June 2018
+    elseif SEG_Method == 19   % apply the segmentation method to a single cell without masking or seeding
         
-        %     waitfor(msgbox('Please upload your membrane marker raw stack images'));
-        %
-        %     [fileName,pathName_MembRaw] = uigetfile('*.tif');
-        %     dname       = fullfile(pathName_MembRaw,fileName);
-        %     filelist_MembRaw = dir([fileparts(dname) filesep '*.tif']);
+
         
         pathName_MembRaw = pathName;
         filelist_MembRaw = filelist;
@@ -636,11 +580,9 @@ try
         end
         
         num_frames = (numel(filelist_MembRaw));
-        % MembRaw = imread(fullfile(pathName_MembRaw, fileNames_MembRaw{Start_Frame}));
         MembRaw = imread(fullfile(pathName_MembRaw, fileNames_MembRaw{1}));
-        %imshow(MembRaw, []);
         
-        Memb_Array = []
+        Memb_Array = [];
         
         End = (numel(fileNames_MembRaw));
         for k = 1:End
@@ -649,72 +591,57 @@ try
             
         end
         
-        %**************************************************************************
-        % Apply segmentation to the first frame *****************
-        %**************************************************************************
+        %******************************************************************
+        % ********* Apply segmentation to the first frame *****************
+        %******************************************************************
         
         
         for z = 1:1       % first frame
             I_Gray = Memb_Array{z};
             Comp_I = imcomplement(I_Gray);
+            
             %**********************************************************
+            
             Window_H  =  100;                     %BlockProcessingHight; %100;
             Window_W  =  100;                     %BlockProcessingWidth; %100;
             Smallest_Obj_remove  = 1;
             
             fun = @(block_struct) thresher(block_struct.data);
-            block_otsu = blockproc(Comp_I,[Window_H, Window_W],fun); %block hight then width
+            block_otsu = blockproc(Comp_I,[Window_H, Window_W],fun); 
             block_otsu = bwareaopen(block_otsu,Smallest_Obj_remove);
-            %imshow(block_otsu);
+
             bw = block_otsu;
             
-            % SE_Wide = strel('rectangle', [3   3]);
-            % BW_Erode = imerode(bw, SE_Wide);
-            % BW_Dilate = imdilate(BW_Erode, SE_Wide);
-            % BW_Fill = imfill(BW_Dilate,'holes');
             level = 1;
             D = -bwdist(~bw);
-            % Ld = watershed(D);
             mask = imextendedmin(D,level);
-            %imshowpair(bw,mask,'blend')
             D2 = imimposemin(D,mask);
             Ld2 = watershed(D2);
             
             
             II = Ld2;
             II(II > 0) = 1;
-            % Binarize the membrane because it is not logical yet
+
             thr = graythresh(II);
             I = imbinarize(II,thr);
-            
-            % Apply skeletonization procedure
+
             I = ~I;
             SE_Wide = strel('rectangle', [3   3]);
             I_Dilate = imdilate(I, SE_Wide);
             I_Erode = imerode(I_Dilate, SE_Wide);
-            
-            
             Thin_I = bwmorph(I_Erode,'thin', inf);
-            % final spur removal
-            I = bwmorph(Thin_I,'spur', inf);   %Final Output
+            I = bwmorph(Thin_I,'spur', inf);  
             
             [H W] = size(I);
             I_Pad = padarray(I, [10 10], 'both');
-            I_Spr = bwmorph(I_Pad, 'spur', Inf);  %Added 17 Nov. 2016.
+            I_Spr = bwmorph(I_Pad, 'spur', Inf); 
             I = imcrop(I_Spr, [11 11 (W-1) (H-1)]);
             I = Largest_Obj(I);
+
+            %**************************************************************
+            % **********  Manually correct the first frame ****************
+            %**************************************************************
             
-            
-            
-            
-            
-            
-            
-            
-            
-            %**************************************************************************
-            % Manually correct the first frame **************************************
-            %**************************************************************************
             ground_truth = Memb_Array{z};
             FileName_ground_truth = fileNames_MembRaw{z};
             
@@ -724,37 +651,37 @@ try
                 
             elseif Previous_Segmentation_Window == 1
                 
-                Previous_ground_truth = Memb_Array{z};  % during initialization only. Added 24 March 2017
-                Previous_FileName_ground_truth = fileNames_MembRaw{z};  % during initialization only. Added 24 March 2017
-                I = Manual_Correction_Tool2_TwoWindow (I, ground_truth, Memb_Array, FileName_ground_truth, Invert_Raw_Image, Previous_ground_truth, Previous_FileName_ground_truth, pathName);
+                Previous_ground_truth = Memb_Array{z};  
+                Previous_FileName_ground_truth = fileNames_MembRaw{z};  
+                I = Manual_Correction_Tool2_TwoWindow (I, ground_truth,...
+                    Memb_Array, FileName_ground_truth, Invert_Raw_Image, ...
+                    Previous_ground_truth, Previous_FileName_ground_truth, pathName);
+            
             end
             
             
             Mask_I = I;
             Mask_Array {z} = Mask_I;  % save the mask
             
-            Pre_Seed =   ~Mask_I;
-            Seed_Obj = imclearborder(Pre_Seed, 4);
-            BW_Seed = FindSeeds (Seed_Obj, SeedSize);
-            Seed_Array {z} =  BW_Seed;
-            
-            SE_FullSeed = strel('rectangle', [Mask_Dilation  Mask_Dilation]);  %or use same Dilation_Size
-            Full_Seed = imerode(Seed_Obj, SE_FullSeed);
-            Both_Seeds = imadd(Full_Seed, BW_Seed);
-            Both_Seeds = im2bw(Both_Seeds);
-            Both_Seeds_Array{1} = Both_Seeds;
+%             Pre_Seed =   ~Mask_I;
+%             Seed_Obj = imclearborder(Pre_Seed, 4);
+%             BW_Seed = FindSeeds (Seed_Obj, SeedSize);
+%             Seed_Array {z} =  BW_Seed;
+%             
+%             SE_FullSeed = strel('rectangle', [Mask_Dilation  Mask_Dilation]);  %or use same Dilation_Size
+%             Full_Seed = imerode(Seed_Obj, SE_FullSeed);
+%             Both_Seeds = imadd(Full_Seed, BW_Seed);
+%             Both_Seeds = im2bw(Both_Seeds);
+%             Both_Seeds_Array{1} = Both_Seeds;
             
             
             %Save the first corrected membrane
-            mkdir('Segmented_Membrane_Result') %where to save results
+            Subfolder_path_and_name = [pathName 'Segmented_Membrane_Result'];
+            mkdir(Subfolder_path_and_name) %where to save results
+
             N_memb = fileNames_MembRaw{z};
-            
-            %         Mask_I = ~Mask_I;
-            %         Mask_I = imclearborder(Mask_I, 4);
-            
-            %imwrite(Mask_I, ['Segmented_Membrane_Result\memb_', N_memb], 'tif', 'Compression','none')
-            
-            imwrite(Reference_Mask, [Subfolder_path_and_name,'\Memb_', N_memb], 'tif', 'Compression','none')
+
+            imwrite(Mask_I, [Subfolder_path_and_name,'\Memb_', N_memb], 'tif', 'Compression','none')
             
             Previous_as_Reference = Mask_I;
             
@@ -779,22 +706,15 @@ try
                 %imshow(block_otsu);
                 bw = block_otsu;
                 
-                % SE_Wide = strel('rectangle', [3   3]);
-                % BW_Erode = imerode(bw, SE_Wide);
-                % BW_Dilate = imdilate(BW_Erode, SE_Wide);
-                % BW_Fill = imfill(BW_Dilate,'holes');
                 level = 1;
                 D = -bwdist(~bw);
-                % Ld = watershed(D);
                 mask = imextendedmin(D,level);
-                %imshowpair(bw,mask,'blend')
                 D2 = imimposemin(D,mask);
                 Ld2 = watershed(D2);
                 
                 
                 II = Ld2;
                 II(II > 0) = 1;
-                % Binarize the membrane because it is not logical yet
                 thr = graythresh(II);
                 I = imbinarize(II,thr);
                 
@@ -805,18 +725,17 @@ try
                 I_Erode = imerode(I_Dilate, SE_Wide);
                 
                 Thin_I = bwmorph(I_Erode,'thin', inf);
-                % final spur removal
-                I = bwmorph(Thin_I,'spur', inf);   %Final Output
+                I = bwmorph(Thin_I,'spur', inf);   
                 
                 [H W] = size(I);
                 I_Pad = padarray(I, [10 10], 'both');
-                I_Spr = bwmorph(I_Pad, 'spur', Inf);  %Added 17 Nov. 2016.
+                I_Spr = bwmorph(I_Pad, 'spur', Inf);  
                 I = imcrop(I_Spr, [11 11 (W-1) (H-1)]);
                 I = Largest_Obj(I);
                 
-                %**************************************************************************
-                %******************* Clean Before Manual Correction *******************
-                %************************ Added 19 June 2018 *******************
+                %**********************************************************
+                %************ Clean Before Manual Correction **************
+                
                 Clean_Area = imfill(Previous_as_Reference,'holes');
                 SEE = strel('disk', membrane_shift );
                 Clean_Outside = imdilate(Clean_Area, SEE);
@@ -829,14 +748,11 @@ try
                 Clean_Inside =  bwmorph(Clean_Inside, 'clean');
                 
                 I = Clean_Inside;
+
+                %**********************************************************
+                % *********** Manually correct the frame ************
+                %**********************************************************
                 
-                %**************************************************************************
-                
-                
-                
-                %**************************************************************************
-                % Manually correct the first frame **************************************
-                %**************************************************************************
                 ground_truth = Memb_Array{z};
                 FileName_ground_truth = fileNames_MembRaw{z};
                 
@@ -846,50 +762,42 @@ try
                     
                 elseif Previous_Segmentation_Window == 1
                     
-                    Previous_ground_truth = Memb_Array{z};  % during initialization only. Added 24 March 2017
-                    Previous_FileName_ground_truth = fileNames_MembRaw{z};  % during initialization only. Added 24 March 2017
-                    I = Manual_Correction_Tool2_TwoWindow (I, ground_truth, Memb_Array, FileName_ground_truth, Invert_Raw_Image, Previous_ground_truth, Previous_FileName_ground_truth, pathName);
+                    Previous_ground_truth = Memb_Array{z};  
+                    Previous_FileName_ground_truth = fileNames_MembRaw{z}; 
+                    I = Manual_Correction_Tool2_TwoWindow (I, ground_truth, ...
+                        Memb_Array, FileName_ground_truth, Invert_Raw_Image, ...
+                        Previous_ground_truth, Previous_FileName_ground_truth, pathName);
                 end
                 
                 
                 Mask_I = I;
                 Mask_Array {z} = Mask_I;  % save the mask
                 
-                Pre_Seed =   ~Mask_I;
-                Seed_Obj = imclearborder(Pre_Seed, 4);
-                BW_Seed = FindSeeds (Seed_Obj, SeedSize);
-                Seed_Array {z} =  BW_Seed;
+%                 Pre_Seed =   ~Mask_I;
+%                 Seed_Obj = imclearborder(Pre_Seed, 4);
+%                 BW_Seed = FindSeeds (Seed_Obj, SeedSize);
+%                 Seed_Array {z} =  BW_Seed;
+%                 
+%                 SE_FullSeed = strel('rectangle', [Mask_Dilation  Mask_Dilation]); 
+%                 Full_Seed = imerode(Seed_Obj, SE_FullSeed);
+%                 Both_Seeds = imadd(Full_Seed, BW_Seed);
+%                 Both_Seeds = im2bw(Both_Seeds);
+%                 Both_Seeds_Array{1} = Both_Seeds;
                 
-                SE_FullSeed = strel('rectangle', [Mask_Dilation  Mask_Dilation]);  %or use same Dilation_Size
-                Full_Seed = imerode(Seed_Obj, SE_FullSeed);
-                Both_Seeds = imadd(Full_Seed, BW_Seed);
-                Both_Seeds = im2bw(Both_Seeds);
-                Both_Seeds_Array{1} = Both_Seeds;
-                
-                
-                %Save the first corrected membrane
-                %mkdir('Segmented_Membrane_Result') %where to save results
+
                 N_memb = fileNames_MembRaw{z};
-                
-                %         Mask_I = ~Mask_I;
-                %         Mask_I = imclearborder(Mask_I, 4);
-                
-                %imwrite(Mask_I, ['Segmented_Membrane_Result\memb_', N_memb], 'tif', 'Compression','none')
-                
-                %imwrite(Mask_I, ['Segmented_Membrane_Result\memb_', N_memb], 'tif', 'Compression','none')
-            
-                imwrite(Reference_Mask, [Subfolder_path_and_name,'\Memb_', N_memb], 'tif', 'Compression','none')
-                
-                
+ 
+                imwrite(Mask_I, [Subfolder_path_and_name,'\Memb_', N_memb], 'tif', 'Compression','none')
                 Previous_as_Reference = Mask_I;
-                
-                
+
             end
             
         end
         
         
         %**********************************************************************
+        
+        
     else
         
         Epith_Memb_Segmentation_Track_and_Correct (     ...
@@ -1392,20 +1300,7 @@ try
                 '"Load Stack" button'})
         end
     end
-    % edit6_val_string = get(handles.edit6, 'String');
-    % num_iter = str2num(edit6_val_string);
-    
-    % edit7_val_string = get(handles.edit7, 'String');
-    % delta_t = str2num(edit7_val_string);
-    
-    % edit8_val_string = get(handles.edit8, 'String');
-    % kappa = str2num(edit8_val_string);
-    
-    % edit9_val_string = get(handles.edit9, 'String');
-    % Dilation_Size = str2num(edit9_val_string);
-    %
-    % edit11_val_string = get(handles.edit11, 'String');
-    % High_Pass_Filter = str2num(edit11_val_string);
+
     
     edit3_val_string = get(handles.edit3, 'String');
     Start_Frame =  str2num(edit3_val_string);
@@ -1652,15 +1547,11 @@ try
     num_frames = (numel(filelist));
     I = imread(fullfile(pathName, fileNames{1}));
     imshow(I,[]);
-    
-    
+
     set(handles.edit4,'String',num_frames);
     set(handles.text5,'String',num_frames);
     
     set(handles.edit31,'String',fileName);
-    
-    
-    %*************** Export ****************
     
     handles.filelist = filelist;
     handles.fileNames = fileNames;
@@ -1668,7 +1559,14 @@ try
     handles.fileName = fileName;
     handles.pathName = pathName;
     
-    guidata(hObject,handles);  % **** ALLOW EXPORTING ******
+    guidata(hObject,handles);
+
+    if num_frames > 1
+        set(handles.slider1,'enable','on')
+    else
+        set(handles.slider1,'enable','off')
+    end
+
 end
 
 
@@ -1865,7 +1763,14 @@ set(handles.edit36,'String',num_frames);
 
 
 handles.X = X;
-    
+
+
+parts = strsplit(pathName, filesep);
+parent_path = strjoin(parts(1:end-1), filesep);
+
+
+handles.parent_path = parent_path;
+
 guidata(hObject,handles);
 
 
@@ -1923,6 +1828,8 @@ function pushbutton32_Callback(hObject, eventdata, handles)
 X = handles.X;
 Y = handles.Y;
 Z = handles.Z;
+parent_path = handles.parent_path;
+
 %*******************************************************************
 %**************************************************************************
 edit32_val_string = get(handles.edit32, 'String');
@@ -1966,12 +1873,7 @@ edit38_val_string = get(handles.edit38, 'String');
 Min_Hist = str2num(edit38_val_string);   %  Starting frame
 
 
-
-
-
-
-
-FRET_Visualize(X, Y, Z, MicPerPix, TimeInterv, StartFrame, EndFrame, Max_Hist, Min_Hist);
+FRET_Visualize(X, Y, Z, MicPerPix, TimeInterv, StartFrame, EndFrame, Max_Hist, Min_Hist, parent_path);
 
 
 % --- Executes on button press in pushbutton33.

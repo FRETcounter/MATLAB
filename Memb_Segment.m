@@ -1,8 +1,17 @@
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+%                  Developed by Mustafa Sami, RIKEN BDR
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
 
-function Output = Memb_Segment(ROI_Memb_Gray,   BW_Mask, SEG_Method,...
-            Current_Seed, BlockProcessingHight, BlockProcessingWidth, ...
-            Current_Minimum_Seed, Manually_Corrected_Membrane, Multithresh_Num_of_Clusters, ...
-            Mask_Dilation, Memb_Constuct_Cluster);
+
+
+function Output = Memb_Segment(Memb_I, ROI_Memb_Gray, BW_Mask, SEG_Method,...
+            Previous_Seed, BlockProcessingHight, BlockProcessingWidth, ...
+            Previous_Minimum_Seed, Manually_Corrected_Membrane, Multithresh_Num_of_Clusters, ...
+            Mask_Dilation, Memb_Constuct_Cluster)
 
 
 
@@ -22,8 +31,6 @@ switch SEG_Method
         %**************************************************************************
         % Apply 15x15 block processing Multhithresholding  first 2 levels
         
-        % BlockProcessingHight = 15;
-        % BlockProcessingWidth = 15;
         
         I = ROI_Memb_Gray;
         %Comp_I = imcomplement(I);
@@ -43,7 +50,7 @@ switch SEG_Method
         
         D2 = imimposemin(D,mask);
         
-        Ld2 = watershed(D2);
+        Ld2 = watershed(D2, 4);
         II = Ld2;
         II(II > 0) = 1;
         
@@ -63,7 +70,7 @@ switch SEG_Method
         I_Dilate = imdilate(II, SE_Wide);
         
         % now put the minimum seed
-        put_seed = immultiply(I_Dilate, ~Current_Minimum_Seed);
+        put_seed = immultiply(I_Dilate, ~Previous_Minimum_Seed);
         put_seed = im2bw(put_seed);
         
         Output = bwmorph(put_seed, 'thin', Inf);   %Final Output
@@ -89,7 +96,7 @@ switch SEG_Method
                         
                         SE = strel('rectangle',[Mask_Dilation   Mask_Dilation]);     %Thickness level of the mask input
                         BW_Significant_Block = imdilate(BW_Significant, SE);
-                        Gray_Significant_Block = immultiply(BW_Significant_Block, ROI_Memb_Gray);
+                        Gray_Significant_Block = immultiply(BW_Significant_Block, Memb_I);     %XXX
                         
                         
                         if Mask_Dilation>=3  % in case we have a block contains more than three pixels
@@ -188,7 +195,7 @@ switch SEG_Method
         
         
         % now put the minimum seed
-        put_seed = immultiply(I_Dilate, ~Current_Minimum_Seed);
+        put_seed = immultiply(I_Dilate, ~Previous_Minimum_Seed);
         put_seed = im2bw(put_seed);
 
         %Second thinning after putting the seed
@@ -201,7 +208,6 @@ switch SEG_Method
         
         Second_I_Thin = RemoveSingelPixelObject(I_Remove_Pad);
         Output = Second_I_Thin;
-
         
 end
 

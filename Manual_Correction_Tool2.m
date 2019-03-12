@@ -1,7 +1,7 @@
 %**************************************************************************
 %**************************************************************************
 %**************************************************************************
-%                  Developed by Mustafa Sami, RIKEN CDB 2016.
+%                  Developed by Mustafa Sami, RIKEN BDR 
 %**************************************************************************
 %**************************************************************************
 %**************************************************************************
@@ -19,19 +19,14 @@ handles.H = figure (500);
 %********************* Full Screen Figure *********************************
 set(gcf, 'units','normalized','outerposition',[0 0 1 1]);% Maximize figure.
 %**************************************************************************
-%if the image is 16 bit then convert it to 8 bit
+%if the image is 16 bit then convert it to 8 bit (for visualization only)
 ground_truth = uint8( (double(ground_truth) - double(min(ground_truth(:)))) /(double(max(ground_truth(:))) - double(min(ground_truth(:)))) * 255 );
 
-
-
 if Invert_Raw_Image ==1
-    ground_truth = imcomplement(ground_truth);  % no dilation for the EM. However, in membrane correction
-    %we applied dilation to improve the apearance of the image
+    ground_truth = imcomplement(ground_truth);
 else
     ground_truth = ground_truth;
 end
-
-
 
 
 subplot(3, 3, 3);
@@ -68,18 +63,12 @@ cumulativeBinaryImage = false(size(burnedImage));
 Fuse_I = [];  %This is important for button-8, Show Old Result.
 %*****************************************************************
 
-
 %mkdir('Segmented_Reference_Mask') %where to save results
 
 Subfolder_path_and_name = [pathName 'Memb_Segmented_Reference_Mask'];
 mkdir(Subfolder_path_and_name) %where to save results
 
-
-
-
-
-
-while again && lineCount < 500
+while again && lineCount < 10000
     choice = menu('Select type of correction. Once finished click Done', ...
         'Keyboard Mode',...
         'Crop & See',...
@@ -107,8 +96,7 @@ while again && lineCount < 500
         
         %**********************************************************************
         %**********************************************************************
-        
-        
+
         if choice ==2   % Crop and See
             try
                 Gr =  ground_truth;  %current frame
@@ -143,10 +131,6 @@ while again && lineCount < 500
                 end
                 
                 close(figure(503));
-                % close (figure (3001));
-                %Z = cell2mat(Image_Numb);
-                %implay(Z);
-                
                 figure, montage(Image_Numb)
                 clear Crop_I
             catch
@@ -160,7 +144,6 @@ while again && lineCount < 500
         if choice ==3  %Preview
             Priv = ~burnedImage;
             figure, imshow(Priv, []);
-            
             % clear the array in button 8, Show Old Result
             Fuse_I = [];
             
@@ -168,7 +151,6 @@ while again && lineCount < 500
         
         %**********************************************************************
         %**********************************************************************
-        
         
         if choice ==10 %Draw Straight Line
             
@@ -259,14 +241,12 @@ while again && lineCount < 500
         
         %**********************************************************************
         %**********************************************************************
-        
-        
+
         if choice ==5 %Hide Segmented Membrane in red
             subplot(3, 3, [1, 2, 4, 5, 7, 8]);
             imshow(ground_truth, []);
             %title('A', 'FontSize', fontSize);
         end
-        
         
         %**********************************************************************
         %**********************************************************************
@@ -335,7 +315,7 @@ while again && lineCount < 500
             burnedImage = ~Dilat_remove_spur;
             burnedImage = imadd(burnedImage, Missing_Pixel);
             burnedImage = im2bw(burnedImage);
-            %now remove any remaining spurs after the break (added 24 Nov. 2016)
+            %now remove any remaining spurs after the break
             burnedImage = bwmorph(~burnedImage, 'spur', Inf);
             burnedImage = ~burnedImage;
             %**********************************************************************
@@ -532,7 +512,7 @@ while again && lineCount < 500
             wait(hx);
             NEW_maskImage = hx.createMask();
             
-            %************** New 1st June 2016 *********************
+            %************** New *********************
             BW = im2bw(BW);
             Clean_ROI = imadd(NEW_maskImage, BW);
             Clean_ROI = im2bw(Clean_ROI);
@@ -899,7 +879,7 @@ while again && lineCount < 500
                     SSE =  strel('square',1);
                     BWW = imdilate(BWW, SSE);
                     
-                    BWW = bwmorph(BWW, 'thin', inf);   % added 20 Sep. 2016
+                    BWW = bwmorph(BWW, 'thin', inf); 
                     
                     burnedImage = ~burnedImage;
                     Both = imadd(BWW, burnedImage);
@@ -1026,10 +1006,7 @@ while again && lineCount < 500
             
             I = im2bw(I);
             hx = eraser_type(gca);
-%             addNewPositionCallback(hx,@(p) title(mat2str(p,3)));
-%             fcn = makeConstrainToRectFcn('impoly',get(gca,'XLim'),...
-%                 get(gca,'YLim'));
-%             setPositionConstraintFcn(hx,fcn);
+
             wait(hx);
             maskImage = hx.createMask();
             inv_maskImage = ~maskImage;

@@ -1,3 +1,12 @@
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+%                  Developed by Mustafa Sami, RIKEN BDR
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+
+
 function burnedImage = Nuclei_Correction_Magnification_Mode(cumulativeBinaryImage, Dilate_GT, burnedImage, ground_truth, Fuse_I)
 fontSize = 10;
 f.GraphicsSmoothing = 'off';
@@ -62,26 +71,7 @@ while 1 == 1
                         BW_corrected = im2bw(corrected);
                         burnedImage = BW_corrected;
                         
-                        %                     M = imfreehand(AX,'Closed',0);
-                        %                     BWW = false(size(M.createMask));
-                        %                     P0 = M.getPosition;
-                        %                     D = ([0; cumsum(sum(abs(diff(P0)),2))]);
-                        %                     P = interp1(D,P0,D(1):.1:D(end),  'linear');
-                        %                     P = unique(round(P),'rows');
-                        %                     S = sub2ind(size(I),P(:,2),P(:,1));
-                        %                     BWW(S) = true;
-                        %
-                        %                     SSE =  strel('square',1);
-                        %                     BWW = imdilate(BWW, SSE);
-                        %
-                        %                     BWW = bwmorph(BWW, 'thin', inf);   % added 20 Sep. 2016
-                        %
-                        %                     burnedImage = ~burnedImage;
-                        %                     Both = imadd(BWW, burnedImage);
-                        %
-                        %                     corrected = ~Both;
-                        %                     BW_corrected = im2bw(corrected);
-                        %                     burnedImage = BW_corrected;
+                        
                         %********************************************
                         %*********** subplot(3, 3, 6) ***************
                         %Show any broken edge available
@@ -171,7 +161,7 @@ while 1 == 1
                             SSE =  strel('square',1);
                             BWW = imdilate(BWW, SSE);
                             
-                            BWW = bwmorph(BWW, 'thin', inf);   % added 20 Sep. 2016
+                            BWW = bwmorph(BWW, 'thin', inf);   
                             
                             burnedImage = ~burnedImage;
                             Both = imadd(BWW, burnedImage);
@@ -370,9 +360,7 @@ while 1 == 1
                     C = cat(3, Red, Green, Blue);
                     subplot(3, 3, [1, 2, 4, 5, 7, 8]);
                     imshow(C, [])
-                    
-                    
-                    
+
                 elseif key== 104  %H key hide membrane
                     subplot(3, 3, [1, 2, 4, 5, 7, 8]);
                     imshow(Dilate_GT, []);
@@ -436,7 +424,7 @@ while 1 == 1
                     burnedImage = ~Dilat_remove_spur;
                     burnedImage = imadd(burnedImage, Missing_Pixel);
                     burnedImage = im2bw(burnedImage);
-                    %now remove any remaining spurs after the break (added 24 Nov. 2016)
+                    %now remove any remaining spurs after the break 
                     burnedImage = bwmorph(~burnedImage, 'spur', Inf);
                     burnedImage = ~burnedImage;
                     %**********************************************************************
@@ -610,8 +598,7 @@ while 1 == 1
                     C = cat(3, Red, Green, Blue);
                     subplot(3, 3, [1, 2, 4, 5, 7, 8]);
                     imshow(C, [])
-                    
-                    
+
                 elseif key==111   % o key used to show old mask
                     
                     if isempty(Fuse_I)
@@ -638,13 +625,8 @@ while 1 == 1
                     end
                     
                     
-                end
-                
-                
-                
+                end  
         end
-        
-        
         burnedImage = burnedImage;
         
     end

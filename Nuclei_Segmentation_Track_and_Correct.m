@@ -1,7 +1,13 @@
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+%                  Developed by Mustafa Sami, RIKEN BDR
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+
+
 %This software is to track and correct the cell nuclei over time-laps confocal images.
-
-
-% Developed by Mustafa Sami, RIKEN BDR, May 2018
 
 
 %**************************************************************************
@@ -25,9 +31,7 @@ try
         
         %XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
         %XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-        
-        
-        
+
         %STEP-1 (A) ***************************************************************
         %************************** Raw Images *********************************
         waitfor(msgbox('Please upload your membrane marker raw stack images'));
@@ -97,46 +101,22 @@ try
             
         elseif Previous_Segmentation_Window == 1
             
-            Previous_ground_truth = Memb_Array{1};  % during initialization only. Added 24 March 2017
-            Previous_FileName_ground_truth = fileNames_MembRaw{1};  % during initialization only. Added 24 March 2017
+            Previous_ground_truth = Memb_Array{1};  % during initialization only. 
+            Previous_FileName_ground_truth = fileNames_MembRaw{1};  % during initialization only. 
             
             I = Nuclei_Manual_Correction_Tool2_TwoWindow (I, ground_truth, Memb_Array, FileName_ground_truth, Invert_Raw_Image, Previous_ground_truth, Previous_FileName_ground_truth, pathName);
         end
         
-        I = bwmorph(I, 'spur', Inf);  %Added 17 Nov. 2016.
+        I = bwmorph(I, 'spur', Inf);  
         Mask_I = I;
         Mask_Array {1} = Mask_I;  % save the mask
-        %     Pre_Seed =  ~Mask_I;
-        %     Seed_Obj = imclearborder(Pre_Seed, 4);
-        %     BW_Seed = FindSeeds (Seed_Obj, SeedSize);  % main central seed
-        %     Seed_Array {1} =  BW_Seed;
-        %
-        %     SE_FullSeed = strel('rectangle', [Mask_Dilation  Mask_Dilation]);  %or use same Dilation_Size
-        %     Full_Seed = imerode(Seed_Obj, SE_FullSeed);
-        %     Both_Seeds = imadd(Full_Seed, BW_Seed);
-        %     Both_Seeds = im2bw(Both_Seeds);
-        %
-        %     %***********************************************************
-        %     %remove any small projections from the seed because they cause wrong
-        %     %segmentation using the watershed     added 8 May, 2017
-        %
-        %     SSE = strel('rectangle', [3 3]);
-        %     Both_Seeds = imopen(Both_Seeds,SSE);
-        %     %***********************************************************
-        %
-        %     Both_Seeds_Array{1} = Both_Seeds;
-        %Save the first corrected membrane
-        %mkdir('Segmented_Membrane_Result') %where to save results
+
         N_memb = fileNames_MembRaw{1};
         
         Mask_I = ~Mask_I;
         Mask_I = imclearborder(Mask_I, 4);
         
         %imwrite(Mask_I, ['Segmented_Membrane_Result\memb_', N_memb], 'tif')
-        
-        
-        
-        
         
         
         %****************** Initialization Ends ***********************************
@@ -158,39 +138,33 @@ try
             
             %***********************************************************
             %remove any small projections from the seed because they cause wrong
-            %segmentation using the watershed     added 8 May, 2017
+            %segmentation using the watershed     
             
             SSE = strel('rectangle', [3 3]);
             Current_Seed = imopen(Current_Seed,SSE);
             %***********************************************************
-            
-            
             
             BW_Mask_Seed = imsubtract(BW_Mask, Current_Seed);
             BW_Mask = im2bw(BW_Mask_Seed);
             
             ROI_Nucl_I = immultiply(Memb_I, BW_Mask);
             
-            % This step found to have no reason to apply  20 April 2017
-            %ROI_Memb_I = uint8( (double(ROI_Memb_I) - double(min(ROI_Memb_I(:)))) /(double(max(ROI_Memb_I(:))) - double(min(ROI_Memb_I(:)))) * 255 );
-            
-            %ROI_Memb_I = uint8 (ROI_Memb_I);  %found to be best one
-            
             %****************************
-            
-            
             %Now apply segmentation
             Manually_Corrected_Membrane = Mask_Array {k-1};
             ROI_Nucl_Gray = ROI_Nucl_I;
             
             
-            I_Nucl_Segment = Memb_Segment(ROI_Nucl_Gray, num_iter, delta_t, kappa, High_Pass_Filter, Dilation_Size, Frame_Val, BW_Mask, SEG_Method, Current_Seed, BlockProcessingHight, BlockProcessingWidth, Current_Minimum_Seed, Manually_Corrected_Membrane, Multithresh_Num_of_Clusters);
+            I_Nucl_Segment = Memb_Segment(ROI_Nucl_Gray, num_iter, delta_t,...
+                kappa, High_Pass_Filter, Dilation_Size, Frame_Val, BW_Mask, ...
+                SEG_Method, Current_Seed, BlockProcessingHight, BlockProcessingWidth,...
+                Current_Minimum_Seed, Manually_Corrected_Membrane, Multithresh_Num_of_Clusters);
             
             %Clean the image from spurs and any seperated objects
             I = I_Nucl_Segment;
             [H W] = size(I);
             I_Pad = padarray(I, [10 10], 'both');
-            I_Spr = bwmorph(I_Pad, 'spur', Inf);  %Added 17 Nov. 2016.
+            I_Spr = bwmorph(I_Pad, 'spur', Inf);  
             I = imcrop(I_Spr, [11 11 (W-1) (H-1)]);
             I = Largest_Obj(I);
             
@@ -205,13 +179,13 @@ try
                 
             elseif Previous_Segmentation_Window == 1
                 
-                Previous_ground_truth = Memb_Array{k-1};  % during initialization only. Added 24 March 2017
-                Previous_FileName_ground_truth = fileNames_MembRaw{k-1};  % during initialization only. Added 24 March 2017
+                Previous_ground_truth = Memb_Array{k-1};  % during initialization only. 
+                Previous_FileName_ground_truth = fileNames_MembRaw{k-1};  % during initialization only. 
                 I = Nuclei_Manual_Correction_Tool2_TwoWindow (I, ground_truth, Memb_Array, FileName_ground_truth, Invert_Raw_Image, Previous_ground_truth, Previous_FileName_ground_truth, pathName);
             end
             
             
-            I = bwmorph(I, 'spur', Inf);  %Added 17 Nov. 2016.
+            I = bwmorph(I, 'spur', Inf);  
             
             Mask_I = I;
             Mask_Array {k} = Mask_I;  % save the mask
@@ -237,9 +211,6 @@ try
             
         end
         
-        
-        
-        
         %XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
         %XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
         
@@ -247,16 +218,7 @@ try
         
         %XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
         %XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-        
-        %     waitfor(msgbox('Please upload your membrane marker raw stack images'));
-        %     [fileName,pathName_MembRaw] = uigetfile('*.tif');
-        %     dname       = fullfile(pathName_MembRaw,fileName);
-        %     filelist_MembRaw = dir([fileparts(dname) filesep '*.tif']);
-        
-        %     filelist_MembRaw = filelist;
-        %     pathName_MembRaw = pathName;
-        
-        
+
         fileNames_MembRaw = {filelist_MembRaw.name}';
         fileNames_MembRaw = fileNames_MembRaw (Start_Frame:End_Frame);  % targeted frames
         
@@ -310,36 +272,18 @@ try
             s_C = 1;
         elseif Previous_Segmentation_Window == 1
             
-            Previous_ground_truth = Memb_Array{1};  % during initialization only. Added 24 March 2017
-            Previous_FileName_ground_truth = fileNames_MembRaw{1};  % during initialization only. Added 24 March 2017
+            Previous_ground_truth = Memb_Array{1};  % during initialization only.
+            Previous_FileName_ground_truth = fileNames_MembRaw{1};  % during initialization only. 
             
             s_Cumm = 1;
             [I, s_Cumm, Intensity_Label_Image] = Nuclei_Manual_Correction_Tool2_TwoWindow (I, s_Cumm, ground_truth, Memb_Array, FileName_ground_truth, Invert_Raw_Image, Previous_ground_truth, Previous_FileName_ground_truth, pathName);
         end
-        
-        
-        
+
         Intensity_Label_Image = uint16(Intensity_Label_Image);
-        
-        
+
         Mask_I = I;
         Mask_Array {1} = Mask_I;  % save the mask
-        
-        %     Pre_Seed =  ~Mask_I;
-        %     Seed_Obj = imclearborder(Pre_Seed, 4);
-        %
-        %     SeedSize = 2;
-        %
-        %     BW_Seed = FindSeeds (Seed_Obj, SeedSize);
-        %     Seed_Array {1} =  BW_Seed;
-        %
-        %     SE_FullSeed = strel('rectangle', [Mask_Dilation  Mask_Dilation]);  %or use same Dilation_Size
-        %     Full_Seed = imerode(Seed_Obj, SE_FullSeed);
-        %     Both_Seeds = imadd(Full_Seed, BW_Seed);
-        %     Both_Seeds = im2bw(Both_Seeds);
-        %     Both_Seeds_Array{1} = Both_Seeds;
-        
-        
+
         %Save the first corrected membrane
         %mkdir('Segmented_Membrane_Result') %where to save results
         N_memb = fileNames_MembRaw{1};
@@ -348,9 +292,7 @@ try
         Mask_I = imclearborder(Mask_I, 4);
         
         %imwrite(Mask_I, ['Segmented_Membrane_Result\memb_', N_memb], 'tif')
-        
-       
-        
+
         if Previous_Segmentation_Window == 1   % in case of two window segmentation only
         Subfolder_path_and_name = [pathName 'Intensity_Label_Result'];
 
@@ -392,8 +334,8 @@ try
                 I = Nuclei_Manual_Correction_Tool2 (I, ground_truth, Memb_Array, FileName_ground_truth, Invert_Raw_Image, pathName);
                 
             elseif Previous_Segmentation_Window == 1
-                Previous_ground_truth = Memb_Array{k-1};  % during initialization only. Added 24 March 2017
-                Previous_FileName_ground_truth = fileNames_MembRaw{k-1};  % during initialization only. Added 24 March 2017
+                Previous_ground_truth = Memb_Array{k-1};  % during initialization only. 
+                Previous_FileName_ground_truth = fileNames_MembRaw{k-1};  % during initialization only. 
                 
                 [I, s_C, Intensity_Label_Image] = Nuclei_Manual_Correction_Tool2_TwoWindow (I, s_Cumm, ground_truth, Memb_Array, FileName_ground_truth, Invert_Raw_Image, Previous_ground_truth, Previous_FileName_ground_truth, pathName);
             end
@@ -403,7 +345,7 @@ try
             
             s_Cumm = s_C;
             
-            I = bwmorph(I, 'spur', Inf);  %Added 17 Nov. 2018.
+            I = bwmorph(I, 'spur', Inf);  
             Mask_I = I;
             Mask_Array {k} = Mask_I;  % save the mask
             

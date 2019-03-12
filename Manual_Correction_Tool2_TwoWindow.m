@@ -1,7 +1,7 @@
 %**************************************************************************
 %**************************************************************************
 %**************************************************************************
-%                  Developed by Mustafa Sami, RIKEN CDB 2016.
+%                  Developed by Mustafa Sami, RIKEN BDR
 %**************************************************************************
 %**************************************************************************
 %**************************************************************************
@@ -62,7 +62,7 @@ lineCount = 0;
 cumulativeBinaryImage = false(size(burnedImage));
 
 %************************************************************
-% Show the previous frame.  Added 24 March 2017
+% Show the previous frame. 
 
 Corrected_Memb_Path=([pathName, 'Memb_Segmented_Reference_Mask']);
 LLIST= getAllFiles(Corrected_Memb_Path);
@@ -101,11 +101,6 @@ else
     
     title(['Previous Raw Image   '  Previous_FileName_ground_truth], 'FontSize', fontSize, 'Interpreter', 'none');
 end
-
-
-
-
-
 
 %*****************************************************************
 Fuse_I = [];  %This is important for button-8, Show Old Result.
@@ -384,7 +379,7 @@ while again && lineCount < 1000
             burnedImage = ~Dilat_remove_spur;
             burnedImage = imadd(burnedImage, Missing_Pixel);
             burnedImage = im2bw(burnedImage);
-            %now remove any remaining spurs after the break (added 24 Nov. 2016)
+            %now remove any remaining spurs after the break 
             burnedImage = bwmorph(~burnedImage, 'spur', Inf);
             burnedImage = ~burnedImage;
             %**********************************************************************
@@ -520,9 +515,6 @@ while again && lineCount < 1000
                     continue
                 end
                 
-                
-                
-                
             else
                 Fuse_I = imread(Fuse_fileNames);
                 ground_truth = ground_truth;
@@ -587,7 +579,7 @@ while again && lineCount < 1000
             wait(hx);
             NEW_maskImage = hx.createMask();
             
-            %************** New 1st June 2016 *********************
+            %************** New  *********************
             BW = im2bw(BW);
             Clean_ROI = imadd(NEW_maskImage, BW);
             Clean_ROI = im2bw(Clean_ROI);
@@ -960,7 +952,7 @@ while again && lineCount < 1000
                     SSE =  strel('square',1);
                     BWW = imdilate(BWW, SSE);
                     
-                    BWW = bwmorph(BWW, 'thin', inf);   % added 20 Sep. 2016
+                    BWW = bwmorph(BWW, 'thin', inf);   
                     
                     burnedImage = ~burnedImage;
                     Both = imadd(BWW, burnedImage);

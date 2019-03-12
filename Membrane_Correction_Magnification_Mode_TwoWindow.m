@@ -1,3 +1,12 @@
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+%                  Developed by Mustafa Sami, RIKEN BDR
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+
+
 function burnedImage = Membrane_Correction_Magnification_Mode_TwoWindow(cumulativeBinaryImage, Dilate_GT, burnedImage, ground_truth, Fuse_I, FileName_ground_truth)
 fontSize = 10;
 f.GraphicsSmoothing = 'off';
@@ -163,7 +172,7 @@ while 1 == 1
                             SSE =  strel('square',1);
                             BWW = imdilate(BWW, SSE);
                             
-                            BWW = bwmorph(BWW, 'thin', inf);   % added 20 Sep. 2016
+                            BWW = bwmorph(BWW, 'thin', inf);   
                             
                             burnedImage = ~burnedImage;
                             Both = imadd(BWW, burnedImage);
@@ -433,7 +442,7 @@ while 1 == 1
                     burnedImage = ~Dilat_remove_spur;
                     burnedImage = imadd(burnedImage, Missing_Pixel);
                     burnedImage = im2bw(burnedImage);
-                    %now remove any remaining spurs after the break (added 24 Nov. 2016)
+                    %now remove any remaining spurs after the break 
                     burnedImage = bwmorph(~burnedImage, 'spur', Inf);
                     burnedImage = ~burnedImage;
                     %**********************************************************************

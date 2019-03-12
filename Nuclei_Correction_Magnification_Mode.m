@@ -1,3 +1,11 @@
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+%                  Developed by Mustafa Sami, RIKEN BDR
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+
 function burnedImage = Nuclei_Correction_Magnification_Mode(cumulativeBinaryImage, Dilate_GT, burnedImage, ground_truth, Fuse_I)
 fontSize = 10;
 f.GraphicsSmoothing = 'off';
@@ -148,7 +156,7 @@ while 1 == 1
                     burnedImage = ~Dilat_remove_spur;
                     burnedImage = imadd(burnedImage, Missing_Pixel);
                     burnedImage = im2bw(burnedImage);
-                    %now remove any remaining spurs after the break (added 24 Nov. 2016)
+                    %now remove any remaining spurs after the break
                     burnedImage = bwmorph(~burnedImage, 'spur', Inf);
                     burnedImage = ~burnedImage;
 

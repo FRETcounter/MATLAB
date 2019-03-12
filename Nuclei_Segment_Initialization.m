@@ -1,9 +1,18 @@
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+%                  Developed by Mustafa Sami, RIKEN BDR
+%**************************************************************************
+%**************************************************************************
+%**************************************************************************
+
+
 function Output = Nuclei_Segment_Initialization(ROI_Nucl_Gray,   ...
         BW_Mask, SEG_Method, Current_Seed, BlockProcessingHight, BlockProcessingWidth, Nuclei_SEG_Method, Min_Nucl_Size)
     
 switch Nuclei_SEG_Method
     
-    case{1}    % Morita-san images
+    case{1}    
 
         BW = imbinarize(ROI_Nucl_Gray, 'adaptive');
         %BW = bwmorph(BW, 'clean');
@@ -18,7 +27,7 @@ switch Nuclei_SEG_Method
         D = -bwdist(~BW);
         mask = imextendedmin(D,level);
         D2 = imimposemin(D,mask);
-        Ld2 = watershed(D2);
+        Ld2 = watershed(D2, 4);
         bw3 = BW;
         bw3(Ld2 == 0) = 0;
         Output = bw3;
