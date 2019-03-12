@@ -1,3 +1,4 @@
+%
 function [ out ] = thresher(in)
 
 thresh = graythresh(in);
